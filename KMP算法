@@ -1,0 +1,57 @@
+#include <iostream>
+#include <cstring>
+using namespace std;
+using ll = long long;
+const int N = 1e6+5;
+char s1[N], s2[N];                        //目标串和模式串  
+int f[N];
+
+void fail(char* a)               //失败函数
+{
+    int m = strlen(a);           //获取字符串的长度，下标从0开始
+    f[0] = -1;
+    for (int j = 1; j <= m-1; j++)
+    {
+        int i = f[j - 1];
+        while (a[j] != a[i + 1] && i >= 0)
+        {
+            i = f[i]; 
+        }
+        if (a[j] == a[i + 1])
+        {
+            f[j] = i + 1;
+        }
+        else
+            f[j] = -1;
+    }
+}
+int main()
+{
+    cin >> s1 >> s2;             //读取目标串（长串）和模式串（短串）
+    fail(s2);
+    int m = strlen(s1), n = strlen(s2);
+    int i = 0, j = 0;
+    while (i < m)                         //长串从s1[0]到s1[m-1],短串从s2[0]到s2[n-1]
+    {
+        if (s1[i] == s2[j])
+        {
+            i++; j++;
+        }
+        else if (j == 0)
+        {
+            i++;
+        }
+        else
+        {
+            j = f[j - 1] + 1;
+        }
+        if (j == n)                        //如果匹配成功
+        {
+            cout << i - n << endl;
+            //j = 0;                         //重新开始匹配
+            //i = i - n + 1;
+            j = f[j - 1] + 1;               //不用回溯
+        }
+    }
+    return 0;
+}
