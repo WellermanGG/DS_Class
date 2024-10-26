@@ -218,3 +218,91 @@ int main(void)
 	Stack s = inToPost(express);
 	print(s);
 }
+
+######################################自写部分########################################
+#include <iostream>
+#include <algorithm>
+#include <stack>
+#include <queue>
+#include <string>
+using namespace std;
+const int N = 1e5 + 5;
+//若取出的字符是操作数，则加入后缀表达式
+//若取出的字符是运算符：
+//a.若为’(’，入栈；
+//b.若为’)’，则依次把栈中的运算符加入后缀表达式，直到出现’(’，然后从栈中删除’(’；
+//c.若为除了括号之外的其他运算符，当其优先级高于栈顶的运算符时，直接入栈；
+//否则从栈顶开始，依次弹出比当前处理的运算符优先级高和优先级相等的运算符，直到遇到一个比它优先级低或遇到了一个左括号为止。
+
+int rankx(char ch)
+{
+    if (ch == '^')return 3;
+    else if (ch == '*' || ch == '/')return 2;
+    else if (ch == '+' || ch == '-')return 1;
+}
+
+int main()
+{
+    char a[100];
+    cin >> a;
+    
+    stack<char> s;          //中缀转后缀
+    queue<char> q;
+
+    int len = strlen(a);
+    for (int i = 0; i < len; i++)
+    {
+        char ch = a[i];
+        if (ch == '(')
+        {
+            s.push(ch);
+        }
+        else if (ch == ')')
+        {
+            while (s.top() != '(')
+            {
+                q.push(s.top());
+                q.push(' ');
+                s.pop();
+            }
+            s.pop();
+        }
+        else if (ch == '*' || ch == '/' || ch == '+' || ch == '-' || ch == '^')
+        {
+            while (1)
+            {
+                if (s.empty() || s.top() == '(' || rankx(s.top()) < rankx(ch))
+                {
+                    s.push(ch);
+                    break;
+                }
+                else if (rankx(s.top()) >= rankx(ch))
+                {
+                    q.push(s.top());
+                    q.push(' ');
+                    s.pop();
+                }
+            }
+        }
+        else
+        {
+            q.push(ch);
+            if (a[i + 1] < '0' || a[i + 1] > '9')
+            {
+                q.push(' ');
+            }
+        }
+    }
+    while (!s.empty())    //将栈清空
+    {
+        q.push(s.top());
+        s.pop();
+    }
+    
+    while (!q.empty())         //测试
+    {
+        cout << q.front();
+        q.pop();
+    }
+    return 0;
+}
