@@ -1,0 +1,360 @@
+#include <iostream>
+#include <stack>
+#include <queue>
+using namespace std;
+using ll = long long;
+const int N = 1e5 + 5;
+
+struct node                  //结点类型
+{
+	char data;
+	node* lchild;
+	node* rchild;
+	node(char data = '#', node* lchild = NULL, node* rchild = NULL) :data(data), lchild(lchild), rchild(rchild) {}   //初始化
+};
+char a[100] = "ABD##E##C#F#G##";
+
+
+node* CreatePre(char* a, int& i);                          //输入(增强)先根序列，返回一个指向根的指针,t采用缺省值在主函数调用时可以少传一个参数
+node* CreateEx();                                          //上机实验常见创建二叉树形式
+node* CopyTree(node* root);                                //复制二叉树
+
+node* CreatePreIn(char* preorder, char* inorder, int n);   //根据二叉树的先根序列和中根序列构建二叉树
+node* CreatePostIn(char* postorder, char* inorder, int n); //根据二叉树的后根序列和中根序列构建二叉树
+bool Check(char* postorder, char* inorder, int n);         //后根序列和中根序列都是大写英文字母，检验是否合法
+int FindRoot(char* inorder, int size, char val);           //在中根序列中找根
+
+
+void Delete(node*& root);                                  //释放根为root的二叉树
+void DeleteTree(node*& root, node* p);                     //在以root为根的二叉树中删除p指向的子树
+
+
+void PreOrder(node* t);                                    //先根遍历根为t的二叉树
+void InOrder(node* t);                                     //中根遍历根为t的二叉树
+void PostOrder(node* t);                                   //后根遍历根为t的二叉树
+
+
+void NorecPreOrder(node* t);                               //非递归先根遍历算法
+void NorecInOrder(node* t);                                //非递归中根遍历算法
+void NorecPostOrder(node* t);                              //非递归后根遍历算法(特殊)
+void LevelOrdet(node* t);                                  //层次遍历
+
+
+node* SearchData(node* root, char a);                      //搜索符合数据域条件的结点
+node* SearchParent(node* root, node* p);                   //搜索给定结点的父结点
+
+
+int Count(node* root);                                     //计算二叉树结点个数
+int Depth(node* root);                                     //计算二叉树高度
+
+
+int main(void)
+{
+	/*int x = 0;
+	node* bintree;
+	bintree = CreatePre(a, x);*/
+
+	char postorder[50], inorder[50];
+	while (cin >> postorder)
+	{
+
+		cin >> inorder;
+
+		if (Check(postorder, inorder, strlen(postorder)))
+		{
+			node* bintree01 = CreatePostIn(postorder, inorder, strlen(postorder));
+			cout << Depth(bintree01) << endl;
+			PreOrder(bintree01);
+			cout << endl;
+
+			Delete(bintree01);
+		}
+		else cout << "INVALID" << endl;
+	}
+
+	return 0;
+}
+
+
+
+
+
+node* CreatePre(char* a, int& i)           
+{
+	node* root = NULL;
+	/*if (a[i] == '\0')                  //只要输入先根序列是合法的，此举没有必要
+	{
+		cout << "完了" << endl;
+		return t;
+	}*/
+	if (a[i] == '#')
+	{
+		i++;
+	}
+	else
+	{
+		root = new node;
+		root->data = a[i];
+		i++;
+
+		root->lchild = CreatePre(a, i);
+		root->rchild = CreatePre(a, i);
+	}
+	return root;
+}
+node* CreateEx()
+{
+	int x; cin >> x;
+	if (x == 0)return NULL;
+	node* root = new node;
+	root->data = x;
+	root->lchild = CreateEx();
+	root->rchild = CreateEx();
+	return root;
+}
+node* CopyTree(node* root)
+{
+	if (root == NULL) return NULL;
+	node* newlptr = CopyTree(root->lchild); //复制左子树
+	node* newrptr = CopyTree(root->rchild); //复制右子树
+	node* newroot = new node; //生成根结点
+	newroot->data = root->data;
+	newroot->lchild = newlptr;
+	newroot->rchild = newrptr;
+	return newroot;
+}
+
+
+node* CreatePreIn(char* preorder, char* inorder, int n)
+{
+	if (n <= 0)return NULL;
+	node* root = new node;
+	root->data = preorder[0];      //先根序列的根
+	int k = FindRoot(inorder, n, root->data);     //在中根序列找根
+	root->lchild = CreatePreIn(&preorder[1], &inorder[0], k);
+	root->rchild = CreatePreIn(&preorder[k+1], &inorder[k+1], n-k-1);
+	return root;
+}
+node* CreatePostIn(char* postorder, char* inorder, int n)
+{
+	if (n <= 0)return NULL;
+	node* root = new node;
+	root->data = postorder[n - 1];  //后根序列的根
+	int k = FindRoot(inorder, n, root->data);     //在中根序列找根
+	root->lchild = CreatePostIn(&postorder[0],&inorder[0],k);
+	root->rchild = CreatePostIn(&postorder[k], &inorder[k+1], n-k-1);
+	return root;
+}
+bool Check(char* postorder, char* inorder, int n)
+{
+	int check[30];
+	for (int i = 0; i < 30; i++)check[i] = 0;
+	for (int i = 0; i < n; i++)
+	{
+		check[postorder[i] - 'A']++;
+	}
+	for (int i = 0; i < n; i++)
+	{
+		check[inorder[i] - 'A']--;
+	}
+	for (int i = 0; i < 30; i++)
+	{
+		if (check[i] != 0)
+		{
+			return false;
+		}
+	}
+	if (n > 0)
+	{
+		int k = FindRoot(inorder, n, postorder[n - 1]);     //在中根序列找根	
+		if (Check(&postorder[0], &inorder[0], k) == false)
+		{
+			return false;
+		}
+		if (Check(&postorder[k], &inorder[k + 1], n - k - 1) == false)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+int FindRoot(char* inorder, int size, char val)
+{
+	for (int i = 0; i < size; i++)
+		if (inorder[i] == val)return i;
+	return -1;
+}
+
+
+
+void Delete(node* &root)           //希望在函数结束后，对root这个指针变量的修改得到保存，使用引用类型
+{
+	if (root == NULL)return;
+	Delete(root->lchild);
+	Delete(root->rchild);
+	delete root;
+	root = NULL;     //要将指针置空
+}
+void DeleteTree(node*& root, node* p)
+{
+	if (root == NULL || p == NULL)return;
+	if (p == root)
+	{
+		Delete(root);
+		return;
+	}
+	DeleteTree(root->lchild, p);
+	DeleteTree(root->rchild, p);
+}
+
+
+void PreOrder(node* t)
+{
+	if (t == NULL)return;
+	cout << t->data;
+	PreOrder(t->lchild);
+	PreOrder(t->rchild);
+}
+void InOrder(node* t)
+{
+	if (t == NULL)return;
+	InOrder(t->lchild);
+	cout << t->data;
+	InOrder(t->rchild);
+}
+void PostOrder(node* t)
+{
+	if (t == NULL)return;
+	PostOrder(t->lchild);
+	PostOrder(t->rchild);
+	cout << t->data;
+}
+
+
+void NorecPreOrder(node* t)
+{
+	stack<node*> s;
+	node* p = t;
+	while (1)
+	{
+		while (p != NULL)
+		{
+			cout << p->data;
+			s.push(p);
+			p = p->lchild;
+		}
+		if (s.empty())return;
+		p = s.top();
+		s.pop();
+		p = p->rchild;
+	}
+}
+void NorecInOrder(node* t)
+{
+	stack<node*> s;
+	node* p = t;
+	while (1)
+	{
+		while (p != NULL)
+		{
+			s.push(p);
+			p = p->lchild;
+		}
+		if (s.empty())return;
+		p = s.top();
+		s.pop();
+		cout << p->data;
+		p = p->rchild;
+	}
+}
+void NorecPostOrder(node* t)
+{
+	stack<pair<node*, int>> s;
+	pair<node*, int> p(t, 0);
+	s.push(p);
+	while (!s.empty())
+	{
+		pair<node*, int> p = s.top();
+		s.pop();
+		if (p.second == 0)                      //表示刚遍历这个结点
+		{
+			p.second = 1;
+			s.push(p);
+			if (p.first->lchild != NULL)
+			{
+				p.first = p.first->lchild;
+				p.second = 0;
+				s.push(p);
+			}
+		}
+		else if (p.second == 1)                //表示已经遍历完左子树
+		{
+			p.second = 2;
+			s.push(p);
+			if (p.first->rchild != NULL)
+			{
+				p.first = p.first->rchild;
+				p.second = 0;
+				s.push(p);
+			}
+		}
+		else if (p.second == 2)                //表示已经遍历右子树，可以直接输出值
+		{
+			cout << p.first->data;
+		}
+	}
+}
+void LevelOrdet(node* t)
+{
+	queue<node*> q;
+	node* p = t;
+	if (p != NULL)
+	{
+		q.push(p);
+	}
+	while (!q.empty())
+	{
+		p = q.front();
+		q.pop();
+		cout << p->data;
+		if (p->lchild != NULL)
+		{
+			q.push(p->lchild);
+		}
+		if (p->rchild != NULL)
+		{
+			q.push(p->rchild);
+		}
+	}
+}
+
+
+node* SearchData(node* root, char a)
+{
+	if (root == NULL)return NULL;
+	if (root->data == a)return root;
+	node* ans = SearchData(root->rchild, a);
+	if (ans != NULL)return ans;
+	return SearchData(root->lchild, a);
+}
+node* SearchParent(node* root, node* p)
+{
+	if (root == NULL || p == root)return NULL;
+	if (root->lchild == p || root->rchild == p)return root;
+	node* ans = SearchParent(root->lchild, p);
+	if (ans != NULL)return ans;
+	return SearchParent(root->rchild, p);
+}
+
+
+int Count(node* root)
+{
+	if (root == NULL)return 0;
+	return Count(root->lchild) + Count(root->rchild) + 1;
+}
+int Depth(node* root)
+{
+	if (root == NULL)return -1;
+	return max(Depth(root->lchild), Depth(root->rchild)) + 1;
+}
+
