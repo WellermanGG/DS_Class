@@ -1,1 +1,109 @@
-///
+#include <iostream>
+#include <stack>
+#include <queue>
+using namespace std;
+using ll = long long;
+const int N = 1e5 + 5;
+
+struct node                  //结点类型
+{
+	char data;
+	node* lchild;
+	node* rchild;
+	int lthread;
+	int rthread;
+	//node(char data = '#', node* lchild = NULL, node* rchild = NULL) :data(data), lchild(lchild), rchild(rchild) {}   //初始化
+};
+char a[100] = "ABD##E##C#F#G##";
+
+
+node* CreatePre(char* a, int& i)
+{
+	node* root = NULL;
+	/*if (a[i] == '\0')                  //只要输入先根序列是合法的，此举没有必要
+	{
+		cout << "完了" << endl;
+		return t;
+	}*/
+	if (a[i] == '#')
+	{
+		i++;
+	}
+	else
+	{
+		root = new node;
+		root->data = a[i];
+		i++;
+
+		root->lchild = CreatePre(a, i);
+		root->rchild = CreatePre(a, i);
+	}
+	return root;
+}
+
+node* FirstInorder(node* root)                              //中根序列第一个结点
+{
+	node* p = root;
+	while (p->lthread == 0)
+	{
+		p = p->lchild;
+	}
+	return p;
+}
+node* LastInorder(node* root)                                //中根序列最后一个结点
+{
+	node* p = root;
+	while (p->rthread == 0)
+	{
+		p = p->rchild;
+	}
+	return p;
+}
+node* NextInorder(node* root)                                 //中根后继结点
+{
+	if (root->rthread == 1)return root->rchild;
+	return FirstInorder(root->rchild);
+}
+node* PreInorder(node* root)                                  //中根前驱结点
+{
+	if (root->lthread == 1)return root->lchild;
+	return LastInorder(root->lchild);
+}
+void Inorder(node* root)                                      //中根遍历
+{
+	for (node* p = FirstInorder(root); p != NULL; p = NextInorder(p))
+		cout << p->data;
+}
+node* pre = NULL;
+void Inorder_threading(node* p)
+{
+	if (p == NULL)return;
+	Inorder_threading(p->lchild);
+	if (p->lchild == NULL)
+	{
+		p->lthread = 1;
+		p->lchild = pre;
+	}
+	else p->lthread = 0;
+	if (pre != NULL && pre->rchild == NULL)
+	{
+		pre->rthread = 1;
+		pre->rchild = p;
+	}
+	else if (pre != NULL)pre->rthread = 0;
+	pre = p;
+	Inorder_threading(p->rchild);
+}
+//执行结束要补一句 pre->rthread = 1;
+
+
+
+int main(void)
+{
+	int x = 0;
+	node* bintree = CreatePre(a, x);
+	Inorder_threading(bintree);
+	pre->rthread = 1;
+	Inorder(bintree);
+	return 0;
+}
