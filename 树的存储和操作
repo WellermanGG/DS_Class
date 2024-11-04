@@ -1,1 +1,98 @@
-///
+#include <iostream>
+#include <stack>
+#include <queue>
+using namespace std;
+using ll = long long;
+const int N = 1e5 + 5;
+
+struct node                  //结点类型
+{
+	char data;
+	node* lchild;
+	node* rsibling ;
+};
+void PreOrder(node* root)                        //森林的先根序列与它对应的二叉树的先根序列相等
+{
+	if (root == NULL)return;
+	cout << root->data;
+	PreOrder(root->lchild);
+	PreOrder(root->rsibling);
+}
+void PostOrder(node* root)                       //森林的后根序列与它对应的二叉树的中根序列相等
+{
+	if (root == NULL)return;
+	PostOrder(root->lchild);
+	cout << root->data;
+	PostOrder(root->rsibling);
+}
+node* Search(node* root, int k)                  //在森林中找值为k的结点
+{
+	if (root == NULL)return NULL;
+	if (root->data == k)return root;
+	node* ans = Search(root->lchild, k);
+	if (ans != NULL)return ans;
+	return Search(root->rsibling, k);
+}
+node* FindParent(node* root, node* p)              //在森林中寻找p的父节点
+{
+	if (root == NULL || p == NULL || p == root)return NULL;
+	for (node* chd = root->lchild; chd != NULL; chd = root->rsibling)
+	{
+		if (chd == p)return root;
+	}
+	node* ans = FindParent(root->lchild, p);
+	if (p != NULL)return ans;
+	return FindParent(root->rsibling, p);
+}
+void Delete(node* root)                              //删除整个森林
+{
+	if (root == NULL)return;
+	Delete(root->lchild);
+	Delete(root->rsibling);
+	delete root;
+	root = NULL;
+}
+bool DelSubTree(node* root, node* p)                  //在森林中删除子树
+{
+	if (root == NULL || p == NULL)return false;
+	if (root = p)
+	{
+		root = root->rsibling;
+		p->rsibling = NULL;
+		delete(p);
+		return true;
+	}
+	if (DelSubTree(root->lchild,p))
+		return true;
+	return DelSubTree(root->rsibling, p);
+}
+node* CreateTree() {                     //带空指针信息的树先根序列创建树/森林
+	int k; cin >> k;
+	if (k == 0) return NULL;
+	node* root = new node;
+	root->data = k;
+	root->lchild = CreateTree();
+	root->rsibling = CreateTree();
+	return root;
+}
+void LevelOrder(node* root) {
+	queue<node*> Q; 
+	node* p, * chd;
+	for (p = root; p != NULL; p = p->rsibling)
+		Q.push(p); //每棵树的根都入队
+	while (!Q.empty()) {
+		p = Q.front(); //出队一个结点p
+		Q.pop();
+		cout << p->data; //访问p
+		for (chd = p->lchild; chd != NULL; chd = chd->rsibling)
+			Q.push(chd); //p的每个孩子都入队
+	}
+}
+
+
+
+int main(void)
+{
+	
+	return 0;
+}
