@@ -1,0 +1,37 @@
+#include <iostream>
+#include <algorithm>
+#include <stack>
+#include <queue>
+using namespace std;
+using ll = long long;
+const int N = 300;
+
+struct HuffmanNode                  //结点类型
+{
+	char data = ' ';
+	int weight;
+	HuffmanNode* left, * right;
+	HuffmanNode(char data = '#', int weight = 0, HuffmanNode* left = NULL, HuffmanNode* right = NULL) :data(data), weight(weight), left(left), right(right) {}
+};
+
+
+
+priority_queue<HuffmanNode*,vector<HuffmanNode*>,cmp> q;
+HuffmanNode* a = new HuffmanNode;
+HuffmanNode* b = new HuffmanNode;
+HuffmanNode* c = new HuffmanNode;
+HuffmanNode* d = new HuffmanNode;
+HuffmanNode* e = new HuffmanNode;
+a->data = 'A'; b->data = 'B'; c->data = 'C'; d->data = 'D'; e->data = 'E';
+a->weight = 1; b->weight = 2; c->weight = 3; d->weight = 4; e->weight = 5;
+q.push(a);
+q.push(b);
+q.push(c);
+q.push(d);
+q.push(e);
+cout << q.top()->weight << endl; q.pop();
+cout << q.top()->weight << endl; q.pop();
+cout << q.top()->weight << endl; q.pop(); 
+cout << q.top()->weight << endl; q.pop();
+cout << q.top()->weight << endl; q.pop();
+delete a; delete b; delete c; delete d; delete e;
