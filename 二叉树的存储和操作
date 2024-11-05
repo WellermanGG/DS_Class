@@ -37,7 +37,7 @@ void PostOrder(node* t);                                   //后根遍历根为t
 void NorecPreOrder(node* t);                               //非递归先根遍历算法
 void NorecInOrder(node* t);                                //非递归中根遍历算法
 void NorecPostOrder(node* t);                              //非递归后根遍历算法(特殊)
-void LevelOrdet(node* t);                                  //层次遍历
+void LevelOrder(node* t);                                  //层次遍历
 
 
 node* SearchData(node* root, char a);                      //搜索符合数据域条件的结点
@@ -304,7 +304,7 @@ void NorecPostOrder(node* t)
 		}
 	}
 }
-void LevelOrdet(node* t)
+void LevelOrder(node* t)
 {
 	queue<node*> q;
 	node* p = t;
