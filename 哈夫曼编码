@@ -8,11 +8,63 @@ const int N = 300;
 
 struct HuffmanNode                  //结点类型
 {
-	char data = ' ';
+	char data;
 	int weight;
 	HuffmanNode* left, * right;
 	HuffmanNode(char data = '#', int weight = 0, HuffmanNode* left = NULL, HuffmanNode* right = NULL) :data(data), weight(weight), left(left), right(right) {}
 };
+struct cmp {
+	bool operator()(HuffmanNode* a, HuffmanNode* b)
+	{
+		return a->weight > b->weight;                    //升序
+	}
+};
+priority_queue<HuffmanNode*,vector<HuffmanNode*>,cmp> pq;
+int WPL = 0;
+void Huffman(char* ch, int* fre, int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		HuffmanNode* t = new HuffmanNode;
+		t->data = ch[i]; t->weight = fre[i];
+		pq.push(t);
+	}
+	for (int i = 1; i < n; i++)
+	{
+		HuffmanNode* a = pq.top(); pq.pop();       //a->weight < b->weight
+		HuffmanNode* b = pq.top(); pq.pop();
+		HuffmanNode* t = new HuffmanNode;
+		t->weight = a->weight + b->weight;
+		//WPL += t->weight;                          //求WPL(加权路径长度)
+		t->left = b; t->right = a;
+		pq.push(t);
+	}
+}
+void WPLPreOrder(HuffmanNode* root, int k = 0)       //先根遍历来求WPL
+{
+	if (root == NULL) return;
+	if (root->left == NULL && root->right == NULL)
+		WPL += root->weight * k;
+	WPLPreOrder(root->left, k + 1);
+	WPLPreOrder(root->right, k + 1);
+}
+void preorder(HuffmanNode* root)
+{
+	if (root == NULL)return;
+	cout << root->weight << endl;
+	preorder(root->left);
+	preorder(root->right);
+}
+int main()
+{
+	char b[10] = { 'a','q','w','r','t' };
+	int a[10] = { 5,6,6,7,15 };
+	Huffman(b, a, 5);
+	WPLPreOrder(pq.top());
+	cout << WPL;
+
+	return 0;
+}
 
 
 
