@@ -1,1 +1,88 @@
-///
+#include <iostream>
+#include <algorithm>
+#include <stack>
+#include <queue>
+using namespace std;
+const int N = 1e3 + 5;
+
+
+struct edge
+{
+    int veradj;
+    int cost;
+    edge* link;
+    edge(int veradj = 0, int cost = 0, edge* link = NULL) :veradj(veradj), cost(cost), link(link) {}
+};
+struct vertex
+{
+    int vername;
+    edge* adjacent;
+    vertex(int vername = 0, edge* adjacent = NULL) :vername(vername), adjacent(adjacent) {}
+};
+
+void getIndegree(vertex* head, int n, int* indegree)
+{
+    for (int i = 0; i < n; i++)indegree[i] = 0;
+    for (int i = 0; i < n; i++)
+    {
+        for (edge* p = head[i].adjacent; p != NULL; p = p->link)
+        {
+            indegree[p->veradj]++;
+        }
+    }
+}
+
+vertex head[N];
+int visited[N];
+void visit(int v){}
+void dfs(vertex* head, int v, int* visited)   
+{
+    //以v为起点进行深度优先搜索，visited数组初值为0
+    visit(v); visited[v] = 1;
+    for (edge* p = head[v].adjacent; p != NULL; p = p->link)
+    {
+        int k = p->veradj;
+        if (visited[k] == 0)
+            dfs(head, k, visited);
+    }
+}
+void dfs2(vertex* head, int v, int* visited)
+{
+    stack<int>s;
+    s.push(v);
+    while (!s.empty())
+    {
+        v = s.top(); s.pop();
+        if (visited[v] == 0)
+        {
+            visit(v); visited[v] = 1;
+            for (edge* p = head[v].adjacent; p != NULL; p = p->link)
+            {
+                if (visited[p->veradj] == 0)s.push(p->veradj);
+            }
+        }
+    }
+}
+void bfs(vertex* head, int v, int* visited)
+{
+    queue<int>q;
+    visit(v); visited[v] = 1;
+    q.push(v);
+    while (!q.empty())
+    {
+        int v = q.front(); q.pop();
+        for (edge* p = head[v].adjacent; p != NULL; p = p->link)
+        {
+            if (visited[p->veradj] == 0)
+            {
+                visit(p->veradj); visited[p->veradj] = 1;
+                q.push(p->veradj);
+            }
+        }
+    }
+}
+
+int main()
+{
+    return 0;
+}
