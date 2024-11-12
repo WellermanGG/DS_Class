@@ -1,1 +1,80 @@
+#include <iostream>
+#include <algorithm>
+#include <stack>
+#include <queue>
+using namespace std;
+const int N = 1e3 + 5;
 
+
+struct edge
+{
+    int veradj;
+    int cost;
+    edge* link;
+    edge(int veradj = 0, int cost = 0, edge* link = NULL) :veradj(veradj), cost(cost), link(link) {}
+};
+struct vertex
+{
+    int vername;
+    edge* adjacent;
+    vertex(int vername = 0, edge* adjacent = NULL) :vername(vername), adjacent(adjacent) {}
+};
+
+void getIndegree(vertex* head, int n, int* indegree)
+{
+    for (int i = 0; i < n; i++)indegree[i] = 0;
+    for (int i = 0; i < n; i++)
+    {
+        for (edge* p = head[i].adjacent; p != NULL; p = p->link)
+        {
+            indegree[p->veradj]++;
+        }
+    }
+}
+
+vertex head[N];
+
+
+bool topoSort(vertex* head, int n)
+{
+    stack<int> s;
+    int indegree[N];
+    getIndegree(head, n, indegree);
+    for (int i = 0; i < n; i++)
+    {
+        if (indegree[i] == 0)s.push(i);
+    }
+    for (int i = 0; i < n; i++)
+    {
+        if (s.empty())return false;
+        int j = s.top(); s.pop();
+        cout << head[j].vername;
+        for (edge* p = head[j].adjacent; p != NULL; p = p->link)
+        {
+            int k = p->veradj;
+            indegree[k]--;
+            if (indegree[k] == 0)s.push(k);
+        }
+    }
+    return true;
+}
+
+int visit[N];
+void dfs_topoSort(vertex* head, int v, int* visit)            //要保证从一个入读为0的点开始dfs
+{
+    visit[v] = 1;
+    for (edge* p = head[v].adjacent; p != NULL; p = p->link)
+    {
+        if (visit[p->veradj] == 0)
+            dfs_topoSort(head, p->veradj, visit);
+    }
+    cout << v;
+}
+
+
+
+
+int main()
+{
+    return 0;
+}
