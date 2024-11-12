@@ -21,7 +21,7 @@ struct cmp {
 };
 priority_queue<HuffmanNode*,vector<HuffmanNode*>,cmp> pq;
 int WPL = 0;
-void Huffman(char* ch, int* fre, int n)
+void Huffman(char* ch, int* fre, int n)   //字符数组及其频率
 {
 	for (int i = 0; i < n; i++)
 	{
