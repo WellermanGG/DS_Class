@@ -20,6 +20,51 @@ struct vertex
     vertex(int vername = 0, edge* adjacent = NULL) :vername(vername), adjacent(adjacent) {}
 };
 
+
+struct datax                        //建立图的邻接链表
+{
+    int a, b;
+}Data[55];
+bool cmp(datax x, datax y)
+{
+    if (x.a == y.a)
+    {
+        return x.b < y.b;
+    }
+    else
+        return x.a < y.a;
+}
+int num[N];
+void createMap(int n, int e)
+{
+    for (int i = 0; i < n; i++)
+    {
+        head[i].vername = i;
+    }
+    for (int i = 0; i < e; i++)
+    {
+        int a = Data[i].a, b = Data[i].b;
+        head[a].vername = a;
+        if (num[a] == 0)
+        {
+            num[a]++;
+            edge* p = new edge;
+            p->veradj = b; p->link = NULL;
+            head[a].adjacent = p;
+        }
+        else
+        {
+            edge* p;
+            for (p = head[a].adjacent; p->link != NULL; p = p->link);
+            edge* q = new edge;
+            q->veradj = b; q->link = NULL;
+            p->link = q;
+            num[a]++;
+        }
+    }
+}
+
+
 void getIndegree(vertex* head, int n, int* indegree)
 {
     for (int i = 0; i < n; i++)indegree[i] = 0;
