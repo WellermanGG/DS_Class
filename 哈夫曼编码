@@ -2,43 +2,100 @@
 #include <algorithm>
 #include <stack>
 #include <queue>
+#include <string>
 using namespace std;
 using ll = long long;
-const int N = 300;
+const int N = 5005;
 
 struct HuffmanNode                  //结点类型
 {
+	int order;           //字符在文本中的次序
+	int time;            //结点生成时间
+	
 	char data;
 	int weight;
 	HuffmanNode* left, * right;
-	HuffmanNode(char data = '#', int weight = 0, HuffmanNode* left = NULL, HuffmanNode* right = NULL) :data(data), weight(weight), left(left), right(right) {}
+	HuffmanNode(char data = '#', int weight = 0, HuffmanNode* left = NULL, HuffmanNode* right = NULL, int order = 0, int time = 0)
+		:data(data), weight(weight), left(left), right(right), order(order), time(time) {}
 };
 struct cmp {
 	bool operator()(HuffmanNode* a, HuffmanNode* b)
 	{
-		return a->weight > b->weight;                    //升序
+		if (a->weight == b->weight)
+		{
+			if (a->data != '#' && b->data != '#')      //对于单结点二叉树，优先选择根结点对应字母在文本中最先出现者
+			{
+				return a->order > b->order;
+			}
+			else if ((a->data == '#' && b->data != '#')|| (a->data != '#' && b->data == '#'))   //若单结点和非单结点二叉树根结点权值相等，优先选择单结点二叉树
+			{
+				return a->data < b->data;
+			}
+			else if (a->data == '#' && b->data == '#')   //对于非单结点二叉树，先生成的二叉树作为左子树，后生成的二叉树作为右子树
+			{
+				return a->time > b->time;
+			}
+		}
+		else
+		{
+			return a->weight > b->weight;
+		}
 	}
 };
-priority_queue<HuffmanNode*,vector<HuffmanNode*>,cmp> pq;
+priority_queue<HuffmanNode*, vector<HuffmanNode*>, cmp> pq;
 int WPL = 0;
-void Huffman(char* ch, int* fre, int n)   //字符数组及其频率
+
+void Huffman(char* ch, int* freq, int n)   //字符数组及其频率
 {
-	for (int i = 0; i < n; i++)
+	for (int i = 1; i <= n; i++)
 	{
 		HuffmanNode* t = new HuffmanNode;
-		t->data = ch[i]; t->weight = fre[i];
+		t->data = ch[i]; t->weight = freq[i];
+		t->order = i;                    //字符在文本中的次序
 		pq.push(t);
 	}
 	for (int i = 1; i < n; i++)
 	{
-		HuffmanNode* a = pq.top(); pq.pop();       //a->weight < b->weight
+		HuffmanNode* a = pq.top(); pq.pop();       //a->weight <= b->weight
 		HuffmanNode* b = pq.top(); pq.pop();
 		HuffmanNode* t = new HuffmanNode;
 		t->weight = a->weight + b->weight;
-		//WPL += t->weight;                          //求WPL(加权路径长度)
-		t->left = b; t->right = a;
+		WPL += t->weight;                        //求WPL(加权路径长度)
+		t->left = a; t->right = b;
+		
+		t->time = i;
 		pq.push(t);
 	}
+}
+void decode(HuffmanNode* root, char* x)
+{
+	int k = strlen(x);
+	HuffmanNode* p = root;
+	queue<char>q;
+	for (int i = 0; i < k; i++)
+	{
+		if (x[i] == '0')p = p->left;
+		else p = p->right;
+		if (p->left == NULL && p->right == NULL)
+		{
+			q.push(p->data);
+			p = root;
+		}
+	}
+	if (p != root)
+	{
+		while (!q.empty())q.pop();
+		cout << "INVALID" << endl;
+		return;
+	}
+	else
+	{
+		while (!q.empty())
+		{
+			cout << q.front(); q.pop();
+		}
+	}
+	cout << endl;
 }
 void WPLPreOrder(HuffmanNode* root, int k = 0)       //先根遍历来求WPL
 {
@@ -48,42 +105,107 @@ void WPLPreOrder(HuffmanNode* root, int k = 0)       //先根遍历来求WPL
 	WPLPreOrder(root->left, k + 1);
 	WPLPreOrder(root->right, k + 1);
 }
-void preorder(HuffmanNode* root)
+
+char text[N], ch[N];
+int freq[N];
+int visit[N];    //同时记录字符x是否在text中首次出现，以及在ch中的位置
+string code[N];
+void preorderDecode(HuffmanNode* root, string s = "")
 {
 	if (root == NULL)return;
-	cout << root->weight << endl;
-	preorder(root->left);
-	preorder(root->right);
+	if (root->data != '#');
+	char x = root->data;
+	code[visit[x - 'a']] = s;
+
+	s = s + '0';
+	preorderDecode(root->left,s);
+
+	s.erase(s.end() - 1);
+	s = s + '1';
+	preorderDecode(root->right,s);
+}
+
+struct sign
+{
+	char ch;
+	int freq;
+	int place;
+	string code;
+}Sign[N];
+bool cmpx(sign a, sign b)
+{
+	if (a.freq == b.freq)
+	{
+		return a.place < b.place;
+	}
+	else
+	{
+		return a.freq < b.freq;
+	}
 }
 int main()
 {
-	char b[10] = { 'a','q','w','r','t' };
-	int a[10] = { 5,6,6,7,15 };
-	Huffman(b, a, 5);
-	WPLPreOrder(pq.top());
-	cout << WPL;
+	char code1[N], code2[N];
+	cin >> text >> code1 >> code2;
+	int len_text = strlen(text);
+	int endd = 1;    //endd指向ch中待存的位置
+	for (int i = 0; i < len_text; i++)
+	{
+		if (visit[text[i] - 'a'] == 0)
+		{
+			visit[text[i] - 'a'] = endd;           //记录存储位置
+			ch[endd] = text[i]; freq[endd]++;
+			endd++;			
+		}
+		else
+		{
+			freq[visit[text[i] - 'a']]++;
+		}
+	}
+	ch[endd] = '\0';
+	int len_ch = endd - 1;
+	Huffman(ch, freq, len_ch);
+	HuffmanNode* root = pq.top(); pq.pop();
 
+	int ans;
+	if (WPL % 8 == 0)ans = WPL / 8;
+	else ans = WPL / 8 + 1;
+	cout << len_text << " " << ans << endl;
+
+	preorderDecode(root);
+	for (int i = 1; i <= len_ch; i++)
+	{
+		Sign[i].ch = ch[i];
+		Sign[i].freq = freq[i];
+		Sign[i].code = code[i];
+		Sign[i].place = i;
+	}
+	sort(Sign + 1, Sign + 1 + len_ch, cmpx);
+	for (int i = 1; i <= len_ch; i++)
+	{
+		cout << Sign[i].ch << ":" << Sign[i].code << endl;
+	}
+
+	decode(root, code1);
+	decode(root, code2);
 	return 0;
 }
 
 
 
 priority_queue<HuffmanNode*,vector<HuffmanNode*>,cmp> q;
-HuffmanNode* a = new HuffmanNode;
-HuffmanNode* b = new HuffmanNode;
-HuffmanNode* c = new HuffmanNode;
-HuffmanNode* d = new HuffmanNode;
-HuffmanNode* e = new HuffmanNode;
-a->data = 'A'; b->data = 'B'; c->data = 'C'; d->data = 'D'; e->data = 'E';
-a->weight = 1; b->weight = 2; c->weight = 3; d->weight = 4; e->weight = 5;
-q.push(a);
-q.push(b);
-q.push(c);
-q.push(d);
-q.push(e);
-cout << q.top()->weight << endl; q.pop();
-cout << q.top()->weight << endl; q.pop();
-cout << q.top()->weight << endl; q.pop(); 
-cout << q.top()->weight << endl; q.pop();
-cout << q.top()->weight << endl; q.pop();
-delete a; delete b; delete c; delete d; delete e;
+    HuffmanNode* a = new HuffmanNode;
+    HuffmanNode* b = new HuffmanNode;
+    HuffmanNode* c = new HuffmanNode;
+    HuffmanNode* d = new HuffmanNode;
+    HuffmanNode* e = new HuffmanNode;
+    a->data = 'A'; b->data = 'B'; c->data = 'C'; d->data = 'D'; e->data = 'E';
+    a->weight = 7; b->weight = 2; c->weight = 2; d->weight = 6; e->weight = 5;
+    a->i=1;b->i=2;c->i=3;d->i=4;e->i=5;
+    q.push(a);q.push(b);q.push(c);q.push(d);q.push(e);
+    while(!q.empty())
+    {
+        HuffmanNode* t=q.top();q.pop();
+        cout<<t->data<<' '<<t->weight<<' '<<t->i<<endl;
+    }
+    delete a; delete b; delete c; delete d; delete e;
