@@ -74,6 +74,49 @@ void dfs_topoSort(vertex* head, int v, int* visit)            //要保证从一�
 
 
 
+struct datax
+{
+    int a, b;
+}Data[55];
+bool cmp(datax x, datax y)
+{
+    if (x.a == y.a)
+    {
+        return x.b < y.b;
+    }
+    else
+        return x.a < y.a;
+}
+int num[N];
+void createMap(int n, int e)        //建立边链表
+{
+    for (int i = 0; i < n; i++)
+    {
+        head[i].vername = i;
+    }
+    for (int i = 0; i < e; i++)
+    {
+        int a = Data[i].a, b = Data[i].b;
+        head[a].vername = a;
+        if (num[a] == 0)
+        {
+            num[a]++;
+            edge* p = new edge;
+            p->veradj = b; p->link = NULL;
+            head[a].adjacent = p;
+        }
+        else
+        {
+            edge* p;
+            for (p = head[a].adjacent; p->link != NULL; p = p->link);
+            edge* q = new edge;
+            q->veradj = b; q->link = NULL;
+            p->link = q;
+            num[a]++;
+        }
+    }
+}
+
 int main()
 {
     return 0;
