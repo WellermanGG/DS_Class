@@ -25,7 +25,7 @@ struct datax
 {
     int a, b;
 }Data[55];
-bool cmp(datax x, datax y)
+bool cmp(datax x, datax y)            //先排a，再排b
 {
     if (x.a == y.a)
     {
