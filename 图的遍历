@@ -23,7 +23,7 @@ struct vertex          //邻接表的顶点
 
 struct datax                        
 {
-    int a, b;
+    int a, b;                         //有向边a到b，或者无向边ab
 }Data[55];
 bool cmp(datax x, datax y)            //先排a，再排b
 {
