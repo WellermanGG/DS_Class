@@ -6,14 +6,14 @@ using namespace std;
 const int N = 1e3 + 5;
 
 
-struct edge
+struct edge            //邻接表的边结点
 {
     int veradj;
     int cost;
     edge* link;
     edge(int veradj = 0, int cost = 0, edge* link = NULL) :veradj(veradj), cost(cost), link(link) {}
 };
-struct vertex
+struct vertex          //邻接表的顶点
 {
     int vername;
     edge* adjacent;
@@ -21,7 +21,7 @@ struct vertex
 };
 
 
-struct datax                        //建立图的邻接链表
+struct datax                        
 {
     int a, b;
 }Data[55];
@@ -34,8 +34,8 @@ bool cmp(datax x, datax y)
     else
         return x.a < y.a;
 }
-int num[N];
-void createMap(int n, int e)
+int num[N];      
+void createMap(int n, int e)           //建立图的邻接链表
 {
     for (int i = 0; i < n; i++)
     {
@@ -77,7 +77,7 @@ void getIndegree(vertex* head, int n, int* indegree)
     }
 }
 
-vertex head[N];
+vertex head[N];          //邻接表的顶点数组
 int visited[N];
 void visit(int v){}
 void dfs(vertex* head, int v, int* visited)   
@@ -91,7 +91,7 @@ void dfs(vertex* head, int v, int* visited)
             dfs(head, k, visited);
     }
 }
-void dfs2(vertex* head, int v, int* visited)
+void dfs2(vertex* head, int v, int* visited)          //非递归dfs
 {
     stack<int>s;
     s.push(v);
