@@ -39,7 +39,7 @@ void createMap(int n, int e)           //建立图的邻接链表
 {
     for (int i = 0; i < n; i++)
     {
-        head[i].vername = i;
+        head[i].vername = i;           //建图此步有一关键要点
     }
     for (int i = 0; i < e; i++)
     {
