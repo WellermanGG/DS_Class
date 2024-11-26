@@ -151,7 +151,7 @@ void Warshall(int G[M][M], int n, bool R[M][M])
         {
             for (int j = 1; j <= n; j++)
             {
-                R[i][j] = R[i][j] || (R[i][j] && R[k][j]);
+                R[i][j] = R[i][j] || (R[i][k] && R[k][j]);
             }
         }
     }
