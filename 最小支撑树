@@ -135,6 +135,7 @@ int Kruskal(Edge* E, int n, int e)
     return INF;
 }
 
+//求可及矩阵
 void Warshall(int G[M][M], int n, bool R[M][M])
 {
     for (int i = 1; i <= n; i++)//假定G是无权图
@@ -155,6 +156,7 @@ void Warshall(int G[M][M], int n, bool R[M][M])
         }
     }
 }
+//求强连通分量
 int SCC(int G[M][M], int n, int* scc)
 {
     bool R[M][M] = { {0} };
