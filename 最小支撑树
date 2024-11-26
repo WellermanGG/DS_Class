@@ -163,7 +163,7 @@ int SCC(int G[M][M], int n, int* scc)
     for (int i = 1; i <= n; i++)scc[i] = 0;
     Warshall(G, n, R);
     int t = 0;
-    for (int i = 1; i < n; i++)
+    for (int i = 1; i <= n; i++)
     {
         if (scc[i] = 0)
         {
