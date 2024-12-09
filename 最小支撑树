@@ -51,7 +51,7 @@ int Prim(int G[M][M], int n, int u, int* lowcost, int* pre)
         sum += lowcost[v];
         for (int w = 1; w <= n; w++)
         {
-            if (s[w] = 0 && G[v][w] < lowcost[w])
+            if (s[w] == 0 && G[v][w] < lowcost[w])
             {
                 lowcost[w] = G[v][w];
                 pre[w] = v;
