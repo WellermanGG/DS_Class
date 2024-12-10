@@ -21,7 +21,7 @@ node* CopyTree(node* root);                                //复制二叉树
 
 node* CreatePreIn(char* preorder, char* inorder, int n);   //根据二叉树的先根序列和中根序列构建二叉树
 node* CreatePostIn(char* postorder, char* inorder, int n); //根据二叉树的后根序列和中根序列构建二叉树
-bool Check(char* postorder, char* inorder, int n);         //后根序列和中根序列都是大写英文字母，检验是否合法
+bool Check(char* postorder, char* inorder, int n);         //检验后根序列和中根序列是否合法（都是大写英文字母）
 int FindRoot(char* inorder, int size, char val);           //在中根序列中找根
 
 
