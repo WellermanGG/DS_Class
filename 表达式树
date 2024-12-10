@@ -93,6 +93,18 @@ int Compute(node* t)
 	return ans1 / ans2;
 }
 
+void dfs(node* root, int height, int* visit)       //可用dfs求最右子表达式
+{
+	if (root == NULL)return;
+	if (visit[height] == 0)
+	{
+		cout << root->data;
+		visit[height] = 1;
+	}
+	dfs(root->rchild, height + 1, visit);
+	dfs(root->lchild, height + 1, visit);
+}
+
 int main()
 {
 
