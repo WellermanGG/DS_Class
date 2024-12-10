@@ -1,45 +1,57 @@
 #include <iostream>
 using namespace std;
-const int N = 1e5;
+const int N = 1e5 + 5;
 
 int Parent[N];
-void Make_Set(int x) { //最终版本
-    Parent[x] = 0; //根结点的秩为0
+void Make_Set(int x) 
+{ 
+    Parent[x] = 0;           //根结点的秩为0
 }
-int Find(int x) { //最终版本
-    if (Parent[x] == 0) return x; //x是根
-    Parent[x] = Find(Parent[x]); //路径压缩
+int Find(int x) 
+{ 
+    if (Parent[x] == 0) return x;           //x是根
+    Parent[x] = Find(Parent[x]);            //路径压缩
     return Parent[x];
 }
 
-void Union(int x, int y) { //最终版本
+//每个结点维护一个秩, 表示以该结点为根的子树的高度的上界
+//合并操作：秩大的根作为秩小的根的父亲
+//只有根结点的秩在合并时起作用，根结点Parent域空闲，故可以用Parent域保存结点的秩
+//若x不是根结点：Parent[x]：x的父亲下标
+//若x是根结点：Parent[x]：x秩的相反数
+void Union(int x, int y)
+{ 
     int fx = Find(x), fy = Find(y);
-    if (fx == fy) return; //x和y在同一棵树
-    if (Parent[fx] < Parent[fy]) //fy秩小
-        //存的是秩的相反数，实际上相当 rank[fx] > rank[fy] 
-        Parent[fy] = fx; //fx作为fy的父结点
-    else if (Parent[fx] > Parent[fy]) //fx秩小
-        Parent[fx] = fy; //fy作为fx的父结点
-    else { //fx和fy秩相等
-        Parent[fx] = fy; //fy作为fx的父结点
-        Parent[fy]--; //fy秩加1
+    if (fx == fy) return;                    //x和y在同一棵树
+    if (Parent[fx] < Parent[fy])             //fy秩小
+                                             //存的是秩的相反数，实际上相当 rank[fx] > rank[fy] 
+        Parent[fy] = fx;                     //fx作为fy的父结点
+    else if (Parent[fx] > Parent[fy])        //fx秩小
+        Parent[fx] = fy;                     //fy作为fx的父结点
+    else 
+    {                                        //fx和fy秩相等
+        Parent[fx] = fy;                     //fy作为fx的父结点
+        Parent[fy]--;                        //fy秩加1
     }
 }
 
-void EquivalenceClass(int n, int m, int q) {
+void EquivalenceClass(int n, int m, int q) 
+{
     //等价性问题，n为元素个数，m为等价元素对数，q为查询数
     int x, y;
     for (int i = 1; i <= n; i++) Make_Set(i); //初始化并查集
-    while (m--) { //处理等价关系
+    while (m--) 
+    { //处理等价关系
         cin >> x >> y; //读入一对等价元素
         Union(x, y); //合并x、y所在的集合
     }
-    while (q--) { //处理查询
+    while (q--) 
+    { //处理查询
         cin >> x >> y; //读入一个查询
         if (Find(x) == Find(y)) cout << "YES" << endl;
         else cout << "NO" << endl;
     }
-} 
+}
 int main()
 {
     std::cout << "Hello World!\n";
