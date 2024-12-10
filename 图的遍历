@@ -66,24 +66,24 @@ void createMap(int n, int e)           //建立图的邻接链表
 
 
 for (int i = 1; i <= n; i++)     //直接建立邻接表
-        {
-            head[i].vername = i;
-        }
-        for (int i = 1; i <= e; i++)
-        {
-            int a, b, cost; cin >> a >> b >> cost;
-            edge* p = head[a].adjacent;
-            if (p == NULL)
-            {
-                head[a].adjacent = new edge(b, cost, NULL);
-            }
-            else
-            {
-                while (p->link != NULL)p = p->link;
-                edge* q = new edge(b, cost, NULL);
-                p->link = q;
-            }
-        }
+{
+    head[i].vername = i;
+}
+for (int i = 1; i <= e; i++)
+{
+    int a, b, cost; cin >> a >> b >> cost;
+    edge* p = head[a].adjacent;
+    if (p == NULL)
+    {
+        head[a].adjacent = new edge(b, cost, NULL);
+    }
+    else
+    {
+        while (p->link != NULL)p = p->link;
+        edge* q = new edge(b, cost, NULL);
+        p->link = q;
+    }
+}
 
 
 void getIndegree(vertex* head, int n, int* indegree)
