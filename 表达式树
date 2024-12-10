@@ -9,34 +9,40 @@ const int N = 300;
 struct node                //结点类型
 {
 	char data;
-	node* left, * right;
+	node* lchild;
+	node* rchild;
 };
-node* BuildExpTree(char* s, int n) {
-	//将长度为n的后缀表达式s转换为表达式树，返回根结点指针
+
+node* BuildExpTree01(char* s, int n)      //将长度为n的后缀表达式s转换为表达式树，返回根结点指针
+{
 	stack<node*> stk;
 	for (int i = 0; i < n; i++) {
 		node* p = new node;
 		p->data = s[i];
 		if (s[i] >= '0' && s[i] <= '9') //操作数
-			p->left = p->right = NULL;
-		else { //运算符
-			p->right = stk.top(); stk.pop();
-			p->left = stk.top(); stk.pop();
+		{
+			p->lchild = p->rchild = NULL;
+		}
+		else 
+		{        //运算符
+			p->rchild = stk.top(); stk.pop();
+			p->lchild = stk.top(); stk.pop();
 		}
 		stk.push(p);
 	}
 	return stk.top();
-} 
+}
 
 
 
 stack<node*> EXP; //表达式结点栈
 stack<char> OP; //运算符栈
-void operation() {
+void operation()
+{
 	node* op = new node;
 	op->data = OP.top(); OP.pop();
-	op->right = EXP.top(); EXP.pop();
-	op->left = EXP.top(); EXP.pop();
+	op->rchild = EXP.top(); EXP.pop();
+	op->lchild = EXP.top(); EXP.pop();
 	EXP.push(op);
 }
 int rankx(char ch)         //判断级别
@@ -46,20 +52,25 @@ int rankx(char ch)         //判断级别
 	else if (ch == '+' || ch == '-')return 1;
 	else return 0;
 }
-node* build(char* s, int n) { //将长度为n的中缀表达式s转换为表达式树，返回根指针
-	for (int i = 0; i < n; i++) {
-		if (s[i] >= '0' && s[i] <= '9') { //假定操作数只有1位
+node* BuildExpTree02(char* s, int n)      //将长度为n的中缀表达式s转换为表达式树，返回根指针
+{	
+	for (int i = 0; i < n; i++)
+	{
+		if (s[i] >= '0' && s[i] <= '9')
+		{  //假定操作数只有1位
 			node* p = new node;
-			p->data = s[i]; p->left = p->right = NULL;
+			p->data = s[i]; p->lchild = p->rchild = NULL;
 			EXP.push(p);
 		}
 		else if (s[i] == '(') OP.push(s[i]);
-		else if (s[i] == ')') {
+		else if (s[i] == ')')
+		{
 			while (OP.top() != '(')
 				operation();
 			OP.pop();
 		}
-		else {
+		else
+		{
 			while (!OP.empty() && OP.top() != '(' && rankx(s[i]) <= rankx(OP.top()))
 				operation();
 			OP.push(s[i]);
@@ -68,12 +79,13 @@ node* build(char* s, int n) { //将长度为n的中缀表达式s转换为表达�
 	while (!OP.empty()) operation();
 	return EXP.top();
 }
-int Calc(node* t) { // t指向非空且合法的表达式树的根
-	if (t->left == NULL && t->right == NULL) //若t是操作数
+int Compute(node* t)           
+{   // t指向非空且合法的表达式树的根
+	if (t->lchild == NULL && t->rchild == NULL) //若t是操作数
 		return t->data - '0'; //假定操作数为0…9
 	//若t是运算符
-	int ans1 = Calc(t->left); //计算左子树的值
-	int ans2 = Calc(t->right); //计算右子树的值
+	int ans1 = Compute(t->lchild); //计算左子树的值
+	int ans2 = Compute(t->rchild); //计算右子树的值
 	char op = t->data; //假定仅有+-*/运算, 且除法除数肯定不为0
 	if (op == '+') return ans1 + ans2;
 	else if (op == '-') return ans1 - ans2;
@@ -84,5 +96,4 @@ int Calc(node* t) { // t指向非空且合法的表达式树的根
 int main()
 {
 
-	return 0;
 }
