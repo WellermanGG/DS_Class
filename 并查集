@@ -2,6 +2,10 @@
 using namespace std;
 const int N = 1e5 + 5;
 
+//数组下标：结点编号
+//数组元素值：父结点下标
+// Parent[i]：结点i的父结点下标
+// 若i是根结点： Parent[i] = 0
 int Parent[N];
 void Make_Set(int x) 
 { 
