@@ -131,7 +131,7 @@ void printPath(int s, int t,int path[M][M])
         cout << path[s][t] << " ";
     }
 }
-void Warshall(int G[M][M], int n, bool R[M][M])
+void Warshall(int G[M][M], int n, bool R[M][M])     //求可及矩阵
 {
     for (int i = 1; i <= n; i++)//假定G是无权图
     {
