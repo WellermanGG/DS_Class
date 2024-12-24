@@ -1,0 +1,53 @@
+#include <iostream>
+#include <algorithm>
+#include <stack>
+#include <queue>
+using namespace std;
+const int INF = 0x3f3f3f3f;
+const int N = 1e5 + 5;
+
+void shiftUp(int* R, int n, int i);
+void shiftDown(int* R, int n, int i);
+void buildHeap(int* R, int n);
+void heapSort(int* R, int n);
+
+int main()
+{
+	
+}
+
+void shiftUp(int* R, int n, int i)
+{
+	while (i > 1 && R[i] > R[i / 2])
+	{
+		swap(R[i], R[i / 2]);
+		i /= 2;
+	}
+}
+void shiftDown(int* R, int n, int i)
+{
+	while (i <= n / 2)
+	{
+		int maxchd = 2 * i;
+		if (maxchd + 1 <= n && R[maxchd] < R[maxchd + 1])maxchd++;
+		if (R[i] >= R[maxchd])return;
+		swap(R[maxchd], R[i]);
+		i = maxchd;
+	}
+}
+void buildHeap(int* R, int n)
+{
+	for (int i = n / 2; i >= 1; i++)
+	{
+		shiftUp(R, n, i);
+	}
+}
+void heapSort(int* R, int n)
+{
+	buildHeap(R, n);
+	for (int i = n; i > 1; i--)
+	{
+		swap(R[1], R[i]);
+		shiftDown(R, i - 1, 1);
+	}
+}
