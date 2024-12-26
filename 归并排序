@@ -1,0 +1,59 @@
+#include <iostream>
+#include <algorithm>
+#include <stack>
+#include <queue>
+using namespace std;
+const int INF = 0x3f3f3f3f;
+const int N = 1e5 + 5;
+
+void merge(int* R, int low, int mid, int high);
+void mergeSort01(int* R, int m, int n);
+
+void mergeSort02(int* R, int n);
+void mergePass(int* R, int n, int L);
+
+int main()
+{
+	
+}
+void merge(int* R, int low, int mid, int high)
+{
+	int i = low, j = mid + 1, k = 0;
+	int* x = new int[high - low + 1];
+	while (i <= mid && j <= high)
+	{
+		if (R[i] <= R[j])x[k++] = R[i++];
+		else x[k++] = R[j++];
+	}
+	while (i <= mid)x[k++] = R[i++];
+	while (j <= high)x[k++] = R[j++];
+	for (int m = 0; m <= high - low; m++)
+	{
+		R[low + m] = x[m];
+	}
+	delete[]x;
+}
+void mergeSort01(int* R, int m, int n)
+{
+	if (m < n)
+	{
+		int k = (m + n) >> 1;
+		mergeSort01(R, m, k);
+		mergeSort01(R, m + 1, n);
+		merge(R, m, k, n);
+	}
+}
+
+void mergeSort02(int* R, int n)
+{
+	for (int L = 1; L < n; L *= 2)
+		mergePass(R, n, L);
+}
+void mergePass(int* R, int n, int L)
+{
+	int i;
+	for (i = 1; i + 2 * L - 1 <= n; i += 2 * L)
+		merge(R, i, i + L - 1, i + 2 * L - 1);
+	if (i + L - 1 < n)
+		merge(R, i, i + L - 1, n);
+}
