@@ -1,0 +1,43 @@
+#include <iostream>
+#include <algorithm>
+#include <stack>
+#include <queue>
+using namespace std;
+const int INF = 0x3f3f3f3f;
+const int N = 1e5 + 5;
+
+int partition(int* R, int m, int n);
+void quickSort(int* R, int m, int n);
+
+int R[N];
+int main()
+{
+	int n; cin >> n;
+	quickSort(R, 1, n);             //初始调用
+}
+
+int partition(int* R, int m, int n)
+{
+	int k = R[m], L = m + 1, G = n;    //R[m]为基准元素
+	while (L <= G)
+	{
+		while (L <= n && R[L] <= k)L++;
+		while (R[G] > k)G--;
+		if (L < G)
+		{
+			swap(R[L], R[G]);
+			L++; G--;
+		}
+	}
+	swap(R[m], R[G]);
+	return G;
+}
+void quickSort(int* R, int m, int n)
+{
+	if (m < n)
+	{
+		int k = partition(R, m, n);
+		quickSort(R, m, k - 1);
+		quickSort(R, k + 1, n);
+	}
+}
