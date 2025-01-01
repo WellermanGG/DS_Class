@@ -1,1 +1,47 @@
-///
+#include <iostream>
+#include <algorithm>
+#include <stack>
+#include <queue>
+using namespace std;
+const int INF = 0x3f3f3f3f;
+const int N = 1e5 + 5;
+
+int search(int* R, int n, int k)
+{
+	for (int i = 1; i <= n; i++)
+	{
+		if (R[i] == k)return i;
+	}
+	return -1;
+}
+int binarySearch(int* R, int n, int k)    //对半查找
+{
+	int low = 1, high = n, mid;
+	while (low <= high)
+	{
+		mid = (low + high) >> 1;
+		if (k < R[mid])high = mid - 1;
+		else if (k > R[mid])low = mid + 1;
+		else return mid;
+	}
+	return -1;
+}
+int interpolationSearch(int* R, int n, int k) //插值查找
+{
+	int low = 1, high = n, mid;
+	while (low <= high && k >= R[low] && k <= R[high])
+	{
+		if (R[low] == R[high])return low;
+		mid = low + (k - R[low]) * (high - low) / (R[high] - R[low]);
+		if (k < R[mid])high = mid - 1;
+		else if (k > R[mid])low = mid + 1;
+		else return mid;
+	}
+	return -1;
+}
+
+int main()
+{
+	
+}
+
