@@ -10,6 +10,8 @@ void shiftUp(int* R, int n, int i);
 void shiftDown(int* R, int n, int i);
 void buildHeap(int* R, int n);
 void heapSort(int* R, int n);
+void Insert(int* R, int& n, int x);
+int DelMax(int* R, int& n);
 
 int main()
 {
@@ -50,4 +52,16 @@ void heapSort(int* R, int n)
 		swap(R[1], R[i]);
 		shiftDown(R, i - 1, 1);
 	}
+}
+void Insert(int* R, int& n, int x)
+{   //堆尾插入值x
+	R[++n] = x; //x放在R[n+1]处，堆元素个数加1
+	shiftUp(R, n, n); //元素R[n]上浮
+}
+int DelMax(int* R, int& n) 
+{   //删除并返回堆顶, 假设堆非空
+	int MaxKey = R[1]; //暂存堆顶元素
+	R[1] = R[n--]; //堆尾移至堆顶，堆元素个数减1
+	shiftDown(R, n, 1); //新堆顶R[1]下沉
+	return MaxKey;
 }
