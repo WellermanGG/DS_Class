@@ -1,1 +1,179 @@
-///
+#include <iostream>
+#include <algorithm>
+#include <stack>
+#include <queue>
+using namespace std;
+const int INF = 0x3f3f3f3f;
+const int N = 1e5 + 5;
+
+struct BSTnode
+{
+	int key;
+	BSTnode* left;
+	BSTnode* right;
+	BSTnode(int k) { key = k, left = right = NULL; }
+};
+BSTnode* Search1(BSTnode* root, int k);
+BSTnode* Search2(BSTnode* root, int k);
+void Insert1(BSTnode*& root, int k);
+BSTnode* Insert2(BSTnode* root, int k);
+void Remove(BSTnode*& root, int k);
+
+
+
+struct AVLnode
+{
+	int key;
+	int height;
+	AVLnode* left, * right;
+	AVLnode(int k) { key = k; height = 0; left = right = NULL; }
+};
+int Height(AVLnode* t)
+{
+	return(t == NULL) ? -1 : t->height;
+}
+void UpdateHeight(AVLnode* t)
+{
+	t->height = max(Height(t->left), Height(t->right)) + 1;
+}
+void LL(AVLnode*& A);
+void RR(AVLnode*& A);
+void LR(AVLnode*& A);
+void RL(AVLnode*& A);
+void InsertAVL(AVLnode*& root, int k);
+void ReBalance(AVLnode*& t);
+void RemoveAVL(AVLnode*& root, int k);
+
+
+int main()
+{
+	cout << "good";
+}
+
+BSTnode* Search1(BSTnode* root, int k)
+{
+	if (root == NULL || root->key == k)return root;
+	if (k < root->key)return Search1(root->left, k);
+	else return Search1(root->right, k);
+}
+BSTnode* Search2(BSTnode* root, int k)
+{
+	BSTnode* p = root;
+	while (p != NULL)
+	{
+		if (k < p->key)p = p->left;
+		else if (k > p->key)p = p->right;
+		else return p;
+	}
+	return NULL;
+}
+void Insert1(BSTnode*& root, int k)
+{
+	if (root == NULL)root = new BSTnode(k);
+	else if (k < root->key)Insert1(root->left, k);
+	else if (k > root->key)Insert1(root->right, k);
+}
+BSTnode* Insert2(BSTnode* root, int k)
+{
+	if (root == NULL)root = new BSTnode(k);
+	else if (k < root->key)root->left = Insert2(root->left, k);
+	else if (k > root->key)root->right = Insert2(root->right, k);
+	return root;
+}
+void Remove(BSTnode*& root, int k)
+{
+	if (root == NULL)return;
+	if (k < root->key)Remove(root->left, k);
+	else if (k > root->key)Remove(root->right, k);
+	else if (root->left != NULL && root->right != NULL)
+	{   //k有两个孩子
+		BSTnode* s = root->right;
+		while (s->left != NULL)s = s->left;
+		root->key = s->key;
+		Remove(root->right, s->key);
+	}
+	else
+	{   //k有一个或没有孩子
+		BSTnode* oldroot = root;
+		root = (root->left != NULL) ? root->left : root->right;
+		delete oldroot;
+	}
+}
+
+
+void LL(AVLnode*& A)
+{
+	AVLnode* B = A->left;
+	A->left = B->right;
+	B->right = A;
+	UpdateHeight(A);
+	UpdateHeight(B);
+	A = B;
+}
+void RR(AVLnode*& A)
+{
+	AVLnode* B = A->right;
+	A->right = B->left;
+	B->left = A;
+	UpdateHeight(A);
+	UpdateHeight(B);
+	A = B;
+}
+void LR(AVLnode*& A)
+{
+	RR(A->left);
+	LL(A);
+}
+void RL(AVLnode*& A)
+{
+	LL(A->right);
+	RR(A);
+}
+void InsertAVL(AVLnode*& root, int k)
+{
+	if (root == NULL)root = new AVLnode(k);
+	else if (k < root->key)InsertAVL(root->left, k);
+	else if (k > root->key)InsertAVL(root->right, k);
+	ReBalance(root);
+}
+void ReBalance(AVLnode*& t)
+{
+	if (t == NULL) return;
+	if (Height(t->left) - Height(t->right) == 2) 
+	{
+		if (Height(t->left->left) >= Height(t->left->right))
+			LL(t);
+		else
+			LR(t);
+	}
+	else if (Height(t->right) - Height(t->left) == 2) 
+	{
+		if (Height(t->right->right) >= Height(t->right->left))
+			RR(t);
+		else
+			RL(t);
+	}
+	UpdateHeight(t);
+}
+void RemoveAVL(AVLnode*& root, int k)
+{
+	if (root == NULL) return;
+	if (k < root->key) RemoveAVL(root->left, k); //在左子树删K
+	else if (k > root->key) RemoveAVL(root->right, k); //在右子树删K
+	else if (root->left != NULL && root->right != NULL) 
+	{
+		AVLnode* s = root->right;
+		while (s->left != NULL) s = s->left;
+		root->key = s->key; //s为t右子树中根序列第一个结点
+		RemoveAVL(root->right, s->key);
+	}
+	else 
+	{
+		AVLnode* oldroot = root;
+		root = (root->left != NULL) ? root->left : root->right;
+		delete oldroot;
+	}
+	ReBalance(root);
+}
+
+
